@@ -38,6 +38,7 @@ public class AtmAllocationService {
         dto.setAtmTotal(dto.getDenominations().stream().map(DenominationDTO::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
         return dto;
     }
+    
 
     public Map<Integer, List<DenominationDTO>> getNotesToBeUsed(AtmAllocationDTO atmAllocationDTO, BigDecimal withdrawalAmount){
         List<DenominationDTO> notes = atmAllocationDTO.getDenominations().stream().filter(denominationDTO -> denominationDTO.getDenominationTypeCode().equalsIgnoreCase("N")).collect(Collectors.toList());

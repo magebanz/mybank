@@ -74,6 +74,7 @@ public class MyBankResource {
             responseDTO.setTotal(responseDTO.getValue().multiply(BigDecimal.valueOf(denominationDTOList.size())));
             responseDTOList.add(responseDTO);
         });
+        
         return responseDTOList;
     }
 }
