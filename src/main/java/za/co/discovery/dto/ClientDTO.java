@@ -1,4 +1,4 @@
-package za.co.discovery.model;
+package za.co.discovery.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

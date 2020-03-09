@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.ClientDTO;
+import za.co.discovery.dto.ClientDTO;
 
 import javax.persistence.*;
 import java.sql.Date;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import za.co.discovery.model.*;
+import za.co.discovery.dto.*;
 import za.co.discovery.service.*;
 
 import java.math.BigDecimal;
@@ -46,7 +46,7 @@ public class MyBankResource {
     @PostMapping("/withdraw")
     public List<DenominationDTO> withdrawFunds(WithdrawalRequest request) throws Exception {
 
-        ClientDTO client = getSortedTransactionalAccounts(request.getClientID());
+        ClientDTO client = clientService.getAllClientsAccounts(request.getClientID());
 
         AccountDTO account = client.getAccounts().stream().filter(accountDTO -> accountDTO.getClientAccountNumber().equalsIgnoreCase(request.getAccountNumber())).collect(Collectors.toList()).get(0);
         // find ATM
@@ -58,6 +58,9 @@ public class MyBankResource {
         // check if account balance is enough for withdrawal
         if(account.getZarDisplayBalance().compareTo(request.getAmount()) < 0){
             throw new Exception("Insufficient funds.");
+        }
+        if(account.getAccountLimitDTO().getAccountLimit().compareTo(request.getAmount()) < 0) {
+            throw new Exception("Account limit exceeded");
         }
 
         // get notes to be used to fulfill withdrawal request

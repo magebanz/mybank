@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import za.co.discovery.dao.DenominationRepository;
 import za.co.discovery.entities.Denomination;
 import za.co.discovery.error.handling.NoRecordFoundException;
-import za.co.discovery.model.DenominationDTO;
+import za.co.discovery.dto.DenominationDTO;
 
 @Service
 public class DenominationService {

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import za.co.discovery.dao.AtmRepository;
 import za.co.discovery.entities.Atm;
 import za.co.discovery.error.handling.NoRecordFoundException;
-import za.co.discovery.model.AtmDTO;
+import za.co.discovery.dto.AtmDTO;
 
 @Service
 public class AtmService {

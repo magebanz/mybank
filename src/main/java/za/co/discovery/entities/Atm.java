@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.AtmDTO;
+import za.co.discovery.dto.AtmDTO;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

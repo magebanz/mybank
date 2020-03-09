@@ -7,8 +7,8 @@ import org.springframework.stereotype.Service;
 import za.co.discovery.dao.AtmAllocationRepository;
 import za.co.discovery.entities.AtmAllocation;
 import za.co.discovery.error.handling.NoRecordFoundException;
-import za.co.discovery.model.AtmAllocationDTO;
-import za.co.discovery.model.DenominationDTO;
+import za.co.discovery.dto.AtmAllocationDTO;
+import za.co.discovery.dto.DenominationDTO;
 
 import java.math.BigDecimal;
 import java.util.*;

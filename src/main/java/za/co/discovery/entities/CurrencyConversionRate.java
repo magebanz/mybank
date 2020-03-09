@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.CurrencyConversionRateDTO;
+import za.co.discovery.dto.CurrencyConversionRateDTO;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

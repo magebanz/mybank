@@ -1,6 +1,4 @@
-package za.co.discovery.model;
-
-import za.co.discovery.entities.Denomination;
+package za.co.discovery.dto;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

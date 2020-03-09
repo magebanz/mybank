@@ -1,4 +1,4 @@
-package za.co.discovery.model;
+package za.co.discovery.dto;
 
 public class CurrencyDTO {
     private String currencyCode;

@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.AccountDTO;
+import za.co.discovery.dto.AccountDTO;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

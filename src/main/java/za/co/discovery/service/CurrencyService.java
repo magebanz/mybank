@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import za.co.discovery.dao.CurrencyRepository;
 import za.co.discovery.entities.Currency;
 import za.co.discovery.error.handling.NoRecordFoundException;
-import za.co.discovery.model.CurrencyDTO;
+import za.co.discovery.dto.CurrencyDTO;
 
 import java.util.ArrayList;
 import java.util.List;

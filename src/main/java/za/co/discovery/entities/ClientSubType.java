@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.ClientSubTypeDTO;
+import za.co.discovery.dto.ClientSubTypeDTO;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

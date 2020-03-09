@@ -3,16 +3,13 @@ package za.co.discovery.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 import za.co.discovery.dao.ClientRepository;
 import za.co.discovery.error.handling.NoRecordFoundException;
 import za.co.discovery.entities.Client;
-import za.co.discovery.model.AccountDTO;
-import za.co.discovery.model.ClientDTO;
+import za.co.discovery.dto.AccountDTO;
+import za.co.discovery.dto.ClientDTO;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -52,7 +49,7 @@ public class ClientService {
         // get all ZAR Accounts
         List<AccountDTO> currencyAccountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
         currencyAccountDTOs = currencyAccountDTOs.stream()
-                .filter(account -> !account.getAccountTypeCode().contains("LOAN")).collect(Collectors.toList());
+                .filter(account -> account.getAccountTypeDTO().getTransactional()).collect(Collectors.toList());
         
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
         currencyAccountDTOs.sort(accountBalanceComparator.reversed());
@@ -64,9 +61,8 @@ public class ClientService {
     public ClientDTO getAllClientsAccounts(Integer clientID){
         LOGGER.info(String.format("Retrieving all accounts for client ID: %d", clientID));
         ClientDTO clientDTO = retrieveClient(clientID);
-        // filter loan (homeloan/personal loan) accounts
-        List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
-                .filter(account -> !account.getAccountTypeCode().contains("LOAN")).collect(Collectors.toList());
+        // filter transactional accounts
+        List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
 
         accountDTOs.sort(accountBalanceComparator.reversed());
@@ -81,7 +77,7 @@ public class ClientService {
         // get all client Accounts
         List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
         // filter ZAR and HLOAN & PLOAN Accounts
-        accountDTOs = accountDTOs.stream().filter(account -> !account.getAccountTypeCode().contains("LOAN") && !account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
+        accountDTOs = accountDTOs.stream().filter(account -> account.getAccountTypeDTO().getAccountTypeCode().equalsIgnoreCase("CFCA")).collect(Collectors.toList());
         // Comparator for sorting accounts on zarDisplayBalance
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
         

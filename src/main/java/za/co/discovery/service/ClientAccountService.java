@@ -7,9 +7,10 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 import za.co.discovery.dao.ClientAccountRepository;
+import za.co.discovery.dto.AccountTypeDTO;
 import za.co.discovery.entities.ClientAccount;
 import za.co.discovery.error.handling.NoRecordFoundException;
-import za.co.discovery.model.AccountDTO;
+import za.co.discovery.dto.AccountDTO;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -22,12 +23,21 @@ public class ClientAccountService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientAccountService.class);
 
+    private final ClientAccountRepository clientAccountRepository;
+    private final CurrencyService currencyService;
+    private final CurrencyConversionRateService currencyConversionRateService;
+    private final CreditCardLimitService creditCardLimitService;
+
     @Autowired
-    private ClientAccountRepository clientAccountRepository;
+    private AccountTypeService accountTypeService;
+
     @Autowired
-    private CurrencyService currencyService;
-    @Autowired
-    private CurrencyConversionRateService currencyConversionRateService;
+    public ClientAccountService(ClientAccountRepository clientAccountRepository, CurrencyService currencyService, CurrencyConversionRateService currencyConversionRateService, CreditCardLimitService creditCardLimitService) {
+        this.clientAccountRepository = clientAccountRepository;
+        this.currencyService = currencyService;
+        this.currencyConversionRateService = currencyConversionRateService;
+        this.creditCardLimitService = creditCardLimitService;
+    }
 
     private static BigDecimal compare(ClientAccount account1, ClientAccount account2) {
         return account1.getDisplayBalance().subtract(account2.getDisplayBalance());
@@ -52,9 +62,28 @@ public class ClientAccountService {
             accounts.add(dto);
         });
 
+        // add currency conversion rate
         accounts.stream().forEach(accountDTO ->
                 accountDTO.getCurrency().setConversionRateDTO(currencyConversionRateService.getCurrencyConversionRate(accountDTO.getCurrency().getCurrencyCode()).toConversionRateDTO()));
 
+        // add account limits
+        accounts.stream().forEach(accountDTO -> {
+            try{
+                accountDTO.setAccountLimitDTO(creditCardLimitService.getAccountLimit(accountDTO));
+            } catch (NoRecordFoundException nrfe) {
+                LOGGER.error(String.format("No limits set for account number %s", accountDTO.getClientAccountNumber()));
+            }
+        });
+
+        // add account type
+        accounts.stream().forEach(accountDTO -> {
+            try{
+                accountDTO.setAccountTypeDTO(accountTypeService.getAccountType(accountDTO));
+            } catch(NoRecordFoundException nrfe){
+                LOGGER.error(String.format("No account type for account number %s", accountDTO.getClientAccountNumber()));
+                accountDTO.setAccountTypeDTO(new AccountTypeDTO());
+            }
+        });
         // convert balance to ZAR
         accounts.stream().forEach(accountDTO -> {
             SpelExpressionParser parser =  new SpelExpressionParser();
@@ -66,12 +95,16 @@ public class ClientAccountService {
     }
 
     public AccountDTO withdrawAmount(AccountDTO account, BigDecimal withdrawalAmount) throws Exception {
+        // just validate again incase there were other transactions against the account, i.e debit order, send money etc..
         if(account.getZarDisplayBalance().compareTo(withdrawalAmount) < 0){
             throw new Exception("Insufficient funds.");
         }
+        if(account.getAccountLimitDTO().getAccountLimit().compareTo(withdrawalAmount) < 0) {
+            throw new Exception("Account limit exceeded");
+        }
 
         ClientAccount entity = new ClientAccount();
-        entity.setAccountTypeCode(account.getAccountTypeCode());
+        entity.setAccountTypeCode(account.getAccountTypeDTO().getAccountTypeCode());
         entity.setClientID(account.getClientID());
         entity.setClientAccountNumber(account.getClientAccountNumber());
         entity.setCurrencyCode(account.getCurrency().getCurrencyCode());

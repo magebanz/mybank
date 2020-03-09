@@ -1,6 +1,6 @@
 package za.co.discovery.entities;
 
-import za.co.discovery.model.DenominationDTO;
+import za.co.discovery.dto.DenominationDTO;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

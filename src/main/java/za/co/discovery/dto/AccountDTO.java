@@ -1,4 +1,4 @@
-package za.co.discovery.model;
+package za.co.discovery.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -12,6 +12,8 @@ public class AccountDTO {
     private CurrencyDTO currency;
     private BigDecimal displayBalance;
     private BigDecimal zarDisplayBalance;
+    private CreditCardLimitDTO accountLimitDTO;
+    private AccountTypeDTO accountTypeDTO;
 
     public String getClientAccountNumber() {
         return clientAccountNumber;
@@ -59,5 +61,21 @@ public class AccountDTO {
 
     public void setZarDisplayBalance(BigDecimal zarDisplayBalance) {
         this.zarDisplayBalance = zarDisplayBalance;
+    }
+
+    public CreditCardLimitDTO getAccountLimitDTO() {
+        return accountLimitDTO;
+    }
+
+    public void setAccountLimitDTO(CreditCardLimitDTO accountLimitDTO) {
+        this.accountLimitDTO = accountLimitDTO;
+    }
+
+    public AccountTypeDTO getAccountTypeDTO() {
+        return accountTypeDTO;
+    }
+
+    public void setAccountTypeDTO(AccountTypeDTO accountTypeDTO) {
+        this.accountTypeDTO = accountTypeDTO;
     }
 }
