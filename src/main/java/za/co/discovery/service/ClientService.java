@@ -52,9 +52,9 @@ public class ClientService {
         // get all ZAR Accounts
         List<AccountDTO> currencyAccountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
         currencyAccountDTOs = currencyAccountDTOs.stream()
-                .filter(account -> !account.getAccountTypeCode().contains("LOAN") && account.getCurrency().getCurrencyCode().equalsIgnoreCase("ZAR")).collect(Collectors.toList());
+                .filter(account -> !account.getAccountTypeCode().contains("LOAN")).collect(Collectors.toList());
         
-        Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getDisplayBalance);
+        Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
         currencyAccountDTOs.sort(accountBalanceComparator.reversed());
         clientDTO.setAccounts(currencyAccountDTOs);
         LOGGER.info(String.format("Client with client ID: %d has %d transactional accounts", clientID, currencyAccountDTOs.size()));
