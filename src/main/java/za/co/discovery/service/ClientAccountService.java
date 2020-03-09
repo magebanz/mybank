@@ -1,6 +1,8 @@
 package za.co.discovery.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Service;
 import za.co.discovery.dao.ClientAccountRepository;
 import za.co.discovery.entities.ClientAccount;
@@ -20,6 +22,8 @@ public class ClientAccountService {
     private ClientAccountRepository clientAccountRepository;
     @Autowired
     private CurrencyService currencyService;
+    @Autowired
+    private CurrencyConversionRateService currencyConversionRateService;
 
     private static BigDecimal compare(ClientAccount account1, ClientAccount account2) {
         return account1.getDisplayBalance().subtract(account2.getDisplayBalance());
@@ -42,6 +46,17 @@ public class ClientAccountService {
             dto.setCurrency(currencyService.getAllCurrencies().stream()
                     .filter(currencyDTO -> currencyDTO.getCurrencyCode().equalsIgnoreCase(account.getCurrencyCode())).collect(Collectors.toList()).get(0));
             accounts.add(dto);
+        });
+
+        accounts.stream().forEach(accountDTO ->
+                accountDTO.getCurrency().setConversionRateDTO(currencyConversionRateService.getCurrencyConversionRate(accountDTO.getCurrency().getCurrencyCode()).toConversionRateDTO()));
+
+        // convert balance to ZAR
+        accounts.stream().forEach(accountDTO -> {
+            SpelExpressionParser parser =  new SpelExpressionParser();
+            Expression expression = parser.parseExpression(accountDTO.getDisplayBalance() + " " +  accountDTO.getCurrency().getConversionRateDTO().getConversionIndicator() + " " + accountDTO.getCurrency().getConversionRateDTO().getRate());
+            BigDecimal convertedBal = BigDecimal.valueOf((Double) expression.getValue());
+            accountDTO.setZarDisplayBalance(convertedBal);
         });
         return accounts;
     }

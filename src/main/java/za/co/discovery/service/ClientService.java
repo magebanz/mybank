@@ -50,8 +50,10 @@ public class ClientService {
         LOGGER.info(String.format("Retrieving transactional accounts for client ID: %d", clientID));
         ClientDTO clientDTO = retrieveClient(clientID);
         // get all ZAR Accounts
-        List<AccountDTO> currencyAccountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
-                .filter(account -> !account.getAccountTypeCode().contains("LOAN")  && account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
+        List<AccountDTO> currencyAccountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
+        currencyAccountDTOs = currencyAccountDTOs.stream()
+                .filter(account -> !account.getAccountTypeCode().contains("LOAN") && account.getCurrency().getCurrencyCode().equalsIgnoreCase("ZAR")).collect(Collectors.toList());
+        
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getDisplayBalance);
         currencyAccountDTOs.sort(accountBalanceComparator.reversed());
         clientDTO.setAccounts(currencyAccountDTOs);
@@ -59,25 +61,30 @@ public class ClientService {
         return clientDTO;
     }
 
+    public ClientDTO getAllClientsAccounts(Integer clientID){
+        LOGGER.info(String.format("Retrieving all accounts for client ID: %d", clientID));
+        ClientDTO clientDTO = retrieveClient(clientID);
+        // filter loan (homeloan/personal loan) accounts
+        List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
+                .filter(account -> !account.getAccountTypeCode().contains("LOAN")).collect(Collectors.toList());
+        Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
+
+        accountDTOs.sort(accountBalanceComparator.reversed());
+        clientDTO.setAccounts(accountDTOs);
+        return clientDTO;
+    }
+
     public ClientDTO getSortedCurrencyAccounts(Integer clientID){
         LOGGER.info(String.format("Retrieving currency accounts for client ID: %d", clientID));
         ClientDTO clientDTO = retrieveClient(clientID);
 
-        // get all ZAR Accounts
-        List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
-                .filter(account -> !account.getAccountTypeCode().contains("LOAN") && !account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
+        // get all client Accounts
+        List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID);
+        // filter ZAR and HLOAN & PLOAN Accounts
+        accountDTOs = accountDTOs.stream().filter(account -> !account.getAccountTypeCode().contains("LOAN") && !account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
+        // Comparator for sorting accounts on zarDisplayBalance
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
-
-        accountDTOs.stream().forEach(accountDTO ->
-                accountDTO.getCurrency().setConversionRateDTO(currencyConversionRateService.getCurrencyConversionRate(accountDTO.getCurrency().getCurrencyCode()).toConversionRateDTO()));
-
-        // convert balance to ZAR
-        accountDTOs.stream().forEach(accountDTO -> {
-            SpelExpressionParser parser =  new SpelExpressionParser();
-            Expression expression = parser.parseExpression(accountDTO.getDisplayBalance() + " " +  accountDTO.getCurrency().getConversionRateDTO().getConversionIndicator() + " " + accountDTO.getCurrency().getConversionRateDTO().getRate());
-            BigDecimal convertedBal = BigDecimal.valueOf((Double) expression.getValue());
-            accountDTO.setZarDisplayBalance(convertedBal);
-        });
+        
         accountDTOs.sort(accountBalanceComparator.reversed());
         clientDTO.setAccounts(accountDTOs);
         LOGGER.info(String.format("Client with client ID: %d has %d currency accounts", clientID, accountDTOs.size()));
