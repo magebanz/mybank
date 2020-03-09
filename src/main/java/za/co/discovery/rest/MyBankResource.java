@@ -56,7 +56,7 @@ public class MyBankResource {
             throw new Exception(String.format("Amount not available, would you like to withdraw %s",atm.getAtmTotal().toString()));
         }
         // check if account balance is enough for withdrawal
-        if(account.getDisplayBalance().compareTo(request.getAmount()) < 0){
+        if(account.getZarDisplayBalance().compareTo(request.getAmount()) < 0){
             throw new Exception("Insufficient funds.");
         }
 

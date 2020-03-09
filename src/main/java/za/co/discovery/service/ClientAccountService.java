@@ -1,5 +1,7 @@
 package za.co.discovery.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ClientAccountService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientAccountService.class);
 
     @Autowired
     private ClientAccountRepository clientAccountRepository;
@@ -62,7 +66,7 @@ public class ClientAccountService {
     }
 
     public AccountDTO withdrawAmount(AccountDTO account, BigDecimal withdrawalAmount) throws Exception {
-        if(account.getDisplayBalance().compareTo(withdrawalAmount) < 0){
+        if(account.getZarDisplayBalance().compareTo(withdrawalAmount) < 0){
             throw new Exception("Insufficient funds.");
         }
 
@@ -71,7 +75,18 @@ public class ClientAccountService {
         entity.setClientID(account.getClientID());
         entity.setClientAccountNumber(account.getClientAccountNumber());
         entity.setCurrencyCode(account.getCurrency().getCurrencyCode());
+        if(!account.getCurrency().getCurrencyCode().equalsIgnoreCase("ZAR")){
+            SpelExpressionParser parser =  new SpelExpressionParser();
+            String conversionIndicator = (account.getCurrency().getConversionRateDTO().getConversionIndicator().equalsIgnoreCase("/"))? "*":"/";
+            Expression expression = parser.parseExpression(withdrawalAmount + " " +  conversionIndicator + " " + account.getCurrency().getConversionRateDTO().getRate());
+            BigDecimal convertedBal = BigDecimal.valueOf((Double) expression.getValue());
+            // convert withdrawal amount to Account's currency
+            LOGGER.info(String.format("Converted R %s to %s %s", withdrawalAmount.toString(),account.getCurrency().getCurrencyCode(),convertedBal.toString()));
+            withdrawalAmount =  convertedBal;
+
+        }
         entity.setDisplayBalance(account.getDisplayBalance().subtract(withdrawalAmount));
+
         clientAccountRepository.save(entity);
 
         return entity.toAccountDTO();
