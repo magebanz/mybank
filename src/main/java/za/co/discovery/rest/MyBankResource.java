@@ -58,7 +58,7 @@ public class MyBankResource {
             throw new Exception("Insufficient funds.");
         }
 
-        // check if request can be fulfilled using notes only
+        // get notes to be used to fulfill withdrawal request
         Map<Integer, List<DenominationDTO>> usedNotes = allocationService.getNotesToBeUsed(atm, request.getAmount());
         // prints out notes used for withdrawal
         usedNotes.forEach((key,value) -> System.out.println(String.format("Used %d x R %s ", value.size(), value.get(0).getValue().toString())));
