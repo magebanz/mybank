@@ -1,8 +1,8 @@
 package za.co.discovery.rest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,14 +11,16 @@ import za.co.discovery.model.*;
 import za.co.discovery.service.*;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/mybank")
 public class MyBankResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MyBankResource.class);
 
     @Autowired
     private ClientService clientService;
@@ -61,11 +63,11 @@ public class MyBankResource {
         // get notes to be used to fulfill withdrawal request
         Map<Integer, List<DenominationDTO>> usedNotes = allocationService.getNotesToBeUsed(atm, request.getAmount());
         // prints out notes used for withdrawal
-        usedNotes.forEach((key,value) -> System.out.println(String.format("Used %d x R %s ", value.size(), value.get(0).getValue().toString())));
+        usedNotes.forEach((key,value) -> LOGGER.info(String.format("Used %d x R %s ", value.size(), value.get(0).getValue().toString())));
         // withdraw fund;
-        System.out.println(String.format("Account balance before withdrawal is %s for account number %s", account.getDisplayBalance().toString(), account.getClientAccountNumber()));
+        LOGGER.info(String.format("Account balance before withdrawal is %s for account number %s", account.getDisplayBalance().toString(), account.getClientAccountNumber()));
         account  = clientAccountService.withdrawAmount(account,request.getAmount());
-        System.out.println(String.format("Account balance before withdrawal is %s for account number %s", account.getDisplayBalance().toString(), account.getClientAccountNumber()));
+        LOGGER.info(String.format("Account balance before withdrawal is %s for account number %s", account.getDisplayBalance().toString(), account.getClientAccountNumber()));
 
         List<DenominationDTO> responseDTOList = new ArrayList<>();
         usedNotes.forEach((key,denominationDTOList) -> {
@@ -74,7 +76,7 @@ public class MyBankResource {
             responseDTO.setTotal(responseDTO.getValue().multiply(BigDecimal.valueOf(denominationDTOList.size())));
             responseDTOList.add(responseDTO);
         });
-        
+
         return responseDTOList;
     }
 }

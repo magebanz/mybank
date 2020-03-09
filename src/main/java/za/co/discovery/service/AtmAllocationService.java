@@ -1,5 +1,7 @@
 package za.co.discovery.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.discovery.dao.AtmAllocationRepository;
@@ -15,6 +17,7 @@ import java.util.stream.IntStream;
 
 @Service
 public class AtmAllocationService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AtmAllocationService.class);
     @Autowired
     private AtmAllocationRepository atmAllocationRepository;
     @Autowired
@@ -44,7 +47,6 @@ public class AtmAllocationService {
         List<DenominationDTO> notes = atmAllocationDTO.getDenominations().stream().filter(denominationDTO -> denominationDTO.getDenominationTypeCode().equalsIgnoreCase("N")).collect(Collectors.toList());
         //notes total
         BigDecimal totalNotes = notes.stream().map(DenominationDTO::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.println("ATM Notes can fulfill withdrawal request, total = " + totalNotes.toString());
         notes.sort(Comparator.comparing(DenominationDTO::getValue).reversed());
         BigDecimal amountNeeded = withdrawalAmount;
 

@@ -1,5 +1,7 @@
 package za.co.discovery.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -23,6 +25,8 @@ public class ClientService {
     private final ClientAccountService clientAccountService;
     private final CurrencyConversionRateService currencyConversionRateService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientService.class);
+
     @Autowired
     public ClientService(ClientRepository clientRepository, ClientAccountService clientAccountService, CurrencyConversionRateService rateService) {
         this.clientRepository = clientRepository;
@@ -37,27 +41,31 @@ public class ClientService {
      *
      */
     public ClientDTO retrieveClient(Integer clientID) {
+        LOGGER.info(String.format("Retrieving client with ID %d", clientID));
         Optional<Client> client = Optional.ofNullable(clientRepository.findById(clientID).orElseThrow(() -> new NoRecordFoundException(String.format("No record found client ID %d", clientID))));
         return client.get().toClientDto();
     }
 
     public ClientDTO getSortedTransactionalAccounts(Integer clientID){
+        LOGGER.info(String.format("Retrieving transactional accounts for client ID: %d", clientID));
         ClientDTO clientDTO = retrieveClient(clientID);
         // get all ZAR Accounts
-        List<AccountDTO> currencyDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
-                .filter(account -> account.getCurrency().getCurrencyCode().equalsIgnoreCase("ZAR")).collect(Collectors.toList());
+        List<AccountDTO> currencyAccountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
+                .filter(account -> !account.getAccountTypeCode().contains("LOAN")  && account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getDisplayBalance);
-        currencyDTOs.sort(accountBalanceComparator.reversed());
-        clientDTO.setAccounts(currencyDTOs);
+        currencyAccountDTOs.sort(accountBalanceComparator.reversed());
+        clientDTO.setAccounts(currencyAccountDTOs);
+        LOGGER.info(String.format("Client with client ID: %d has %d transactional accounts", clientID, currencyAccountDTOs.size()));
         return clientDTO;
     }
 
     public ClientDTO getSortedCurrencyAccounts(Integer clientID){
+        LOGGER.info(String.format("Retrieving currency accounts for client ID: %d", clientID));
         ClientDTO clientDTO = retrieveClient(clientID);
 
         // get all ZAR Accounts
         List<AccountDTO> accountDTOs = clientAccountService.retrieveAllClientAccounts(clientID).stream()
-                .filter(account -> !account.getCurrency().getCurrencyCode().equalsIgnoreCase("ZAR")).collect(Collectors.toList());
+                .filter(account -> !account.getAccountTypeCode().contains("LOAN") && !account.getCurrency().getCurrencyCode().contains("ZAR")).collect(Collectors.toList());
         Comparator<AccountDTO> accountBalanceComparator = Comparator.comparing(AccountDTO::getZarDisplayBalance);
 
         accountDTOs.stream().forEach(accountDTO ->
@@ -72,6 +80,7 @@ public class ClientService {
         });
         accountDTOs.sort(accountBalanceComparator.reversed());
         clientDTO.setAccounts(accountDTOs);
+        LOGGER.info(String.format("Client with client ID: %d has %d currency accounts", clientID, accountDTOs.size()));
         return clientDTO;
     }
 }
