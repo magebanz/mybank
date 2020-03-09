@@ -13,20 +13,20 @@ import za.co.discovery.service.ClientAccountService;
 import java.util.Comparator;
 import java.util.List;
 
-@RestController
-@RequestMapping("/internal/api")
+//@RestController
+//@RequestMapping("/internal/api")
 public class ClientAccountResource {
 
     @Autowired
     private ClientAccountService clientAccountService;
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientAccountService.class);
 
-    @GetMapping("/retrieve/client/account")
+    //@GetMapping("/retrieve/client/account")
     public ClientAccount retrieveClientAccount(String clientAccountNumber){
         return clientAccountService.retrieveClientAccounts(clientAccountNumber);
     }
 
-    @GetMapping("/retrieve/all/client/account")
+    //@GetMapping("/retrieve/all/client/account")
     public List<AccountDTO> retrieveAllClientAccount(Integer clientID){
         try {
             return clientAccountService.retrieveAllClientAccounts(clientID);

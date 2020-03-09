@@ -8,13 +8,13 @@ import za.co.discovery.model.ClientDTO;
 import za.co.discovery.service.ClientService;
 
 @RestController
-@RequestMapping("/internal/api")
+//@RequestMapping("/internal/api")
 public class ClientResource {
 
     @Autowired
     private ClientService clientService;
 
-    @GetMapping("/retrieve/client")
+   // @GetMapping("/retrieve/client")
     public ClientDTO retrieveClient(Integer clientID) {
         return clientService.retrieveClient(clientID);
     }

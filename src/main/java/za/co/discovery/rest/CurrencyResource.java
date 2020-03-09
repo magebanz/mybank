@@ -9,19 +9,19 @@ import za.co.discovery.service.CurrencyService;
 
 import java.util.List;
 
-@RestController
-@RequestMapping("/internal/api")
+//@RestController
+//@RequestMapping("/internal/api")
 public class CurrencyResource {
 
     @Autowired
     private CurrencyService currencyService;
 
-    @GetMapping("/currencies")
+   // @GetMapping("/currencies")
     public List<CurrencyDTO> loadAllCurrencies(){
         return currencyService.getAllCurrencies();
     }
 
-    @GetMapping("/currency")
+    //@GetMapping("/currency")
     public CurrencyDTO getCurrency(String currencyCode){
         return currencyService.getCurrency(currencyCode).toCurrencyDTO();
     }

@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RestController;
 import za.co.discovery.entities.CurrencyConversionRate;
 import za.co.discovery.service.CurrencyConversionRateService;
 
-@RestController
-@RequestMapping("/internal/api")
+//@RestController
+//@RequestMapping("/internal/api")
 public class CurrencyConversionRateResource {
 
     @Autowired
     private CurrencyConversionRateService conversionRateService;
 
-    @GetMapping("currency/conversion")
+    //@GetMapping("currency/conversion")
     public CurrencyConversionRate getCurrencyConversionRate(String currencyCode){
         return conversionRateService.getCurrencyConversionRate(currencyCode);
     }
