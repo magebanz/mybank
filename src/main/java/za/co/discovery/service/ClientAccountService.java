@@ -71,7 +71,7 @@ public class ClientAccountService {
             try{
                 accountDTO.setAccountLimitDTO(creditCardLimitService.getAccountLimit(accountDTO));
             } catch (NoRecordFoundException nrfe) {
-                LOGGER.error(String.format("No limits set for account number %s", accountDTO.getClientAccountNumber()));
+                LOGGER.warn(String.format("No limits set for account number %s", accountDTO.getClientAccountNumber()));
             }
         });
 
