@@ -2,6 +2,7 @@ package za.co.discovery.entities;
 
 import za.co.discovery.dto.ClientSubTypeDTO;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,6 +10,7 @@ import javax.persistence.Id;
 public class ClientSubType {
 
     @Id
+    @Column(name = "client_sub_type_code")
     private String clientSubTypeCode;
     private String clientTypeCode;
     private String description;

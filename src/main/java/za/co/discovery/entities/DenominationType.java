@@ -1,5 +1,6 @@
 package za.co.discovery.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -7,6 +8,7 @@ import javax.persistence.Id;
 public class DenominationType {
 
     @Id
+    @Column(name = "denomination_type_code")
     private String denominationTypeCode;
     private String description;
 

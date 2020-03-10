@@ -12,7 +12,9 @@ public class AtmAllocation {
     @Id
     @Column(name = "atm_allocation_id")
     private int atmAllocationID;
+    @Column(name = "atm_id")
     private int atmID;
+    @Column(name = "denomination_id")
     private int denominationID;
     private int count;
 

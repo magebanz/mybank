@@ -2,6 +2,7 @@ package za.co.discovery.entities;
 
 import za.co.discovery.dto.CurrencyConversionRateDTO;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 public class CurrencyConversionRate {
 
     @Id
+    @Column(name = "currency_code")
     private String currencyCode;
     private String conversionIndicator;
     private BigDecimal rate;

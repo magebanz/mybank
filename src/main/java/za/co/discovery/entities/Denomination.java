@@ -2,6 +2,7 @@ package za.co.discovery.entities;
 
 import za.co.discovery.dto.DenominationDTO;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 public class Denomination {
 
     @Id
+    @Column(name = "denomination_id")
     private int denominationID;
     private BigDecimal value;
     private String denominationTypeCode;

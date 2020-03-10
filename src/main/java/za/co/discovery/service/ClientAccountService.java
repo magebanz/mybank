@@ -99,7 +99,7 @@ public class ClientAccountService {
         if(account.getZarDisplayBalance().compareTo(withdrawalAmount) < 0){
             throw new Exception("Insufficient funds.");
         }
-        if(account.getAccountLimitDTO().getAccountLimit().compareTo(withdrawalAmount) < 0) {
+        if(account.getAccountLimitDTO() != null && account.getAccountLimitDTO().getAccountLimit().compareTo(withdrawalAmount) < 0) {
             throw new Exception("Account limit exceeded");
         }
 

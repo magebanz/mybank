@@ -59,7 +59,7 @@ public class MyBankResource {
         if(account.getZarDisplayBalance().compareTo(request.getAmount()) < 0){
             throw new Exception("Insufficient funds.");
         }
-        if(account.getAccountLimitDTO().getAccountLimit().compareTo(request.getAmount()) < 0) {
+        if(account.getAccountLimitDTO() != null && account.getAccountLimitDTO().getAccountLimit().compareTo(request.getAmount()) < 0) {
             throw new Exception("Account limit exceeded");
         }
 
