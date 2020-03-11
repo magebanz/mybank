@@ -1,6 +1,6 @@
 # mybank
 
-SQL for transactional account with highest balance is under src/main/resources/static
+Reports SQL: see src/main/resources/static for usecase 4 & 5
 
 I couldn't create UI due to time constrains as well work commitments, so I created MyBankResource to test all the usecases. 
 
